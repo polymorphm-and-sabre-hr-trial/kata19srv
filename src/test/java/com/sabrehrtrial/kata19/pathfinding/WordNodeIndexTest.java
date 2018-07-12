@@ -14,6 +14,13 @@ public class WordNodeIndexTest {
         index = new WordNodeIndex(distEvalMock);
     }
     
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAcceptNullEvaluator() {
+        WordNodeIndex nullIndex = new WordNodeIndex(null);
+        
+        Assert.fail();
+    }
+    
     @Test
     public void shouldBeEmptyByDefault() {
         Assert.assertEquals(0, index.size());
