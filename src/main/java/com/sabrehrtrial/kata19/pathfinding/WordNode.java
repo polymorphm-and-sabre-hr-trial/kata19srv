@@ -59,4 +59,12 @@ public class WordNode {
         node2.neighNodes.add(node1);
     }
     
+    @Override
+    public String toString() {
+        return String.format(
+                "%s[word=%s]",
+                WordNode.super.toString(),
+                word
+        );
+    }
 }
