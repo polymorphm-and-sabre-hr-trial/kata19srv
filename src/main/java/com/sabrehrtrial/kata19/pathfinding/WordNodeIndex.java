@@ -1,9 +1,15 @@
 package com.sabrehrtrial.kata19.pathfinding;
 
+import java.util.HashMap;
+
 /**
  * a structure for keeping all word's nodes with access to anyone by index.
  */
 public class WordNodeIndex {
+    
+    private final DistanceEvaluator distEval;
+    private final HashMap<String, WordNode> allNodeMap;
+    private final HashMap<Integer, HashMap<String, WordNode>> nodeMapBuckets;
     
     /**
      * create empty index structure.
@@ -11,7 +17,14 @@ public class WordNodeIndex {
      * @param distEval reference to function for evaluating a distance.
      */
     public WordNodeIndex(DistanceEvaluator distEval) {
-        throw new UnsupportedOperationException();
+        if (distEval == null) {
+            throw new NullPointerException("distEval is null");
+        }
+        
+        this.distEval = distEval;
+        
+        allNodeMap = new HashMap<>();
+        nodeMapBuckets = new HashMap<>();
     }
     
     /**
@@ -20,7 +33,16 @@ public class WordNodeIndex {
      * @param node a word's node for adding to the index.
      */
     public void addWordNode(WordNode node) {
-        throw new UnsupportedOperationException();
+        if (node == null) {
+            throw new NullPointerException("node is null");
+        }
+        
+        
+        
+        // XXX    it is WRONG (incomplete) implementation
+        allNodeMap.put(node.getWord(), node);
+        
+        
     }
     
     /**
@@ -29,7 +51,9 @@ public class WordNodeIndex {
      * @param word a word for adding to the index.
      */
     public void addWord(String word) {
-        throw new UnsupportedOperationException();
+        WordNode node = new WordNode(word);
+        
+        addWordNode(node);
     }
     
     /**
@@ -39,7 +63,7 @@ public class WordNodeIndex {
      * @return a found word's node or null.
      */
     public WordNode findNodeByWord(String word) {
-        throw new UnsupportedOperationException();
+        return allNodeMap.get(word);
     }
     
     /**
@@ -48,7 +72,7 @@ public class WordNodeIndex {
      * @return count of word's nodes in the index.
      */
     public int size() {
-        throw new UnsupportedOperationException();
+        return allNodeMap.size();
     }
     
 }
