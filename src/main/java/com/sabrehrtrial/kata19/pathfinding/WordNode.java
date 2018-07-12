@@ -52,7 +52,11 @@ public class WordNode {
      * @param node2 another node.
      */
     public static void connectNodes(WordNode node1, WordNode node2) {
-        throw new UnsupportedOperationException();
+        // we don't check that nodes can be already connected,
+        // because this checking requirement is not in the class contract
+        
+        node1.neighNodes.add(node2);
+        node2.neighNodes.add(node1);
     }
     
 }
