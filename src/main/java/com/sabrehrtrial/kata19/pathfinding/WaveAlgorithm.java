@@ -1,6 +1,9 @@
 package com.sabrehrtrial.kata19.pathfinding;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -10,6 +13,101 @@ import java.util.List;
  * recovering a path using these three points and waves information.
  */
 public class WaveAlgorithm {
+    
+    /**
+     * enqueue word nodes to movement queue.
+     * 
+     * @param movQueue a movement queue.
+     * @param gen a generation number for nodes spread info prototypes.
+     * @param nodes neighbours to enqueue.
+     */
+    private void enqueueNodesToMovQueue(
+            LinkedList<WaveSpreadNodeInfo> movQueue,
+            int gen,
+            List<WordNode> nodes) {
+        nodes.forEach((node) -> {
+            WaveSpreadNodeInfo spreadProto = new WaveSpreadNodeInfo(node);
+            
+            spreadProto.setWaveGen(gen);
+            
+            movQueue.add(spreadProto);
+        });
+    }
+    
+    /**
+     * do one spread iteration.
+     *
+     * @param movQueue our movement queue.
+     * @param ourNode our node.
+     * @param oppositeNode the other (opposite) node.
+     * @param ourWaveName out wave name.
+     * @param oppositeWaveName the other (opposite) wave name.
+     * @param waveSpreadInfo map for keeping there wave spread information about
+     * used word's nodes.
+     * @param sizeLimit don't spread a wave that size exceeds this value. -1
+     * value means the wave spreading is unlimited.
+     * @return the point related to interfered wave if there was the
+     * interfering. would be returned null if there no was the interfering.
+     */
+    private WordNode spreadIteration(
+            LinkedList<WaveSpreadNodeInfo> movQueue,
+            WordNode ourNode,
+            WordNode oppositeNode,
+            WaveName ourWaveName,
+            WaveName oppositeWaveName,
+            HashMap<WordNode, WaveSpreadNodeInfo> waveSpreadInfo,
+            int sizeLimit
+    ) {
+        WaveSpreadNodeInfo spreadProto = movQueue.pop();
+        
+        WordNode node = spreadProto.getNode();
+        int waveGen = spreadProto.getWaveGen();
+        
+        if (node == ourNode || node == oppositeNode
+                || sizeLimit != -1 && waveGen > sizeLimit) {
+            // we don't want to process these nodes
+            
+            return null;
+        }
+        
+        WaveSpreadNodeInfo spread = waveSpreadInfo.get(node);
+        
+        if (spread == null) {
+            spread = new WaveSpreadNodeInfo(node);
+            
+            spread.setWaveName(ourWaveName);
+            spread.setWaveGen(waveGen);
+            
+            waveSpreadInfo.put(node, spread);
+            
+            List<WordNode> neighNodes = node.getNeighNodes();
+            int neighWaveGen = waveGen + 1;
+            
+            for (WordNode neighNode : neighNodes) {
+                if (neighNode == oppositeNode) {
+                    // it is not wave interfering,
+                    // but the opposite node is so close.
+                    // another chance won't be
+                    
+                    spread.setWaveName(WaveName.interfWave);
+                    
+                    return node;
+                }
+            }
+            
+            if (sizeLimit == -1 || neighWaveGen <= sizeLimit) {
+                enqueueNodesToMovQueue(movQueue, neighWaveGen, neighNodes);
+            }
+        } else if (spread.getWaveName() == oppositeWaveName) {
+            // we have reached wave interfering!
+            
+            spread.setWaveName(WaveName.interfWave);
+            
+            return node;
+        }
+        
+        return null;
+    }
     
     /**
      * the first phase. to spread two waves from two points of an index,
@@ -34,7 +132,44 @@ public class WaveAlgorithm {
             WordNodeIndex index,
             int sizeLimit
     ) {
-        throw new UnsupportedOperationException();
+        // planning next movements will be kept here
+        LinkedList<WaveSpreadNodeInfo> movSrcQueue = new LinkedList<>();
+        LinkedList<WaveSpreadNodeInfo> movTrgQueue = new LinkedList<>();
+        
+        // bootstrap
+        
+        enqueueNodesToMovQueue(movSrcQueue, 1, sourceNode.getNeighNodes());
+        enqueueNodesToMovQueue(movTrgQueue, 1, targetNode.getNeighNodes());
+        
+        // spreading waves cycle
+        
+        while (!movSrcQueue.isEmpty() && !movTrgQueue.isEmpty()) {
+            // source wave spreading
+            
+            WordNode interfNode = spreadIteration(
+                    movSrcQueue,
+                    sourceNode, targetNode,
+                    WaveName.sourceWave, WaveName.targetWave,
+                    waveSpreadInfo, sizeLimit);
+            
+            if (interfNode != null) {
+                return interfNode;
+            }
+            
+            // target wave spreading
+            
+            interfNode = spreadIteration(
+                    movTrgQueue,
+                    targetNode, sourceNode,
+                    WaveName.targetWave, WaveName.sourceWave,
+                    waveSpreadInfo, sizeLimit);
+            
+            if (interfNode != null) {
+                return interfNode;
+            }
+        }
+        
+        return null;
     }
     
     /**
@@ -54,7 +189,56 @@ public class WaveAlgorithm {
             WaveName waveName,
             HashMap<WordNode, WaveSpreadNodeInfo> waveSpreadInfo
     ) {
-        throw new UnsupportedOperationException();
+        ArrayList<WordNode> path = new ArrayList<>();
+        
+        // we will go from the border to the centre of wave
+        
+        WordNode candidateNode = borderNode;
+        int waveGen = -1;
+        
+        for (;;) {
+            List<WordNode> neighNodes = candidateNode.getNeighNodes();
+            
+            // a cycle iteration will be last if candidateNode remains null
+            candidateNode = null;
+            
+            for (WordNode neighNode : neighNodes) {
+                if (neighNode == centerNode) {
+                    // we've reached the centre of wave
+                    
+                    return path;
+                }
+                
+                WaveSpreadNodeInfo spread = waveSpreadInfo.get(neighNode);
+        
+                if (spread == null) {
+                    continue;
+                }
+                
+                int candidateWaveGen = spread.getWaveGen();
+                
+                if (spread.getWaveName() != waveName
+                        || waveGen != -1 && candidateWaveGen >= waveGen) {
+                    continue;
+                }
+                
+                // we've found a good candidate to inserting into the path!
+                
+                candidateNode = neighNode;
+                waveGen = candidateWaveGen;
+                
+                // but we won't put it into the path immediately,
+                // because we can find better
+            }
+            
+            if (candidateNode == null) {
+                // there are no other nodes to path recovering
+                
+                return path;
+            }
+            
+            path.add(candidateNode);
+        }
     }
     
     /**
@@ -75,6 +259,20 @@ public class WaveAlgorithm {
             WordNode middleNode,
             HashMap<WordNode, WaveSpreadNodeInfo> waveSpreadInfo
     ) {
-        throw new UnsupportedOperationException();
+        List<WordNode> sourcePath = recoveryWavePath(
+                sourceNode, middleNode, WaveName.sourceWave, waveSpreadInfo);
+        List<WordNode> targetPath = recoveryWavePath(
+                targetNode, middleNode, WaveName.targetWave, waveSpreadInfo);
+        
+        Collections.reverse(sourcePath);
+        
+        ArrayList<WordNode> path = new ArrayList<>();
+        
+        path.addAll(sourcePath);
+        path.add(middleNode);
+        path.addAll(targetPath);
+        
+        return path;
     }
+    
 }
