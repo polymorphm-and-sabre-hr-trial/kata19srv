@@ -17,7 +17,7 @@ public class WordNodeIndex {
     /**
      * add a word's node to the index.
      * 
-     * @param node a word's node for adding to the index
+     * @param node a word's node for adding to the index.
      */
     public void addWordNode(WordNode node) {
         throw new UnsupportedOperationException();
@@ -26,7 +26,7 @@ public class WordNodeIndex {
     /**
      * add a word to the index.
      * 
-     * @param word a word for adding to the index 
+     * @param word a word for adding to the index.
      */
     public void addWord(String word) {
         throw new UnsupportedOperationException();

@@ -67,4 +67,5 @@ public class WaveSpreadNodeInfo {
     public int getWaveGen() {
         return waveGen;
     }
+    
 }

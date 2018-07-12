@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class WordNodeIndexTest {
+    
     private DistanceEvaluator distEvalMock;
     private WordNodeIndex index;
     
@@ -122,4 +123,5 @@ public class WordNodeIndexTest {
     public void shouldReturnNullIfFindingWasFailure() {
         Assert.assertNull(index.findNodeByWord("rode"));
     }
+    
 }
