@@ -124,4 +124,25 @@ public class WordNodeIndexTest {
         Assert.assertNull(index.findNodeByWord("rode"));
     }
     
+    @Test
+    public void shouldFindConnectedNodesAfterAddingWords_ifUsedBuckets() {
+        distEvalMock = new DistanceEvaluatorSixWordsAndBucketsMock();
+        index = new WordNodeIndex(distEvalMock);
+        
+        index.addWord("rubs");
+        index.addWord("robs");
+        index.addWord("rods");
+        
+        WordNode firstNode = index.findNodeByWord("rubs");
+        WordNode secondNode = index.findNodeByWord("robs");
+        WordNode thirdNode = index.findNodeByWord("rods");
+        
+        Assert.assertTrue(firstNode.getNeighNodes().contains(secondNode));
+        Assert.assertTrue(secondNode.getNeighNodes().contains(firstNode));
+        Assert.assertTrue(secondNode.getNeighNodes().contains(thirdNode));
+        Assert.assertTrue(thirdNode.getNeighNodes().contains(secondNode));
+        Assert.assertFalse(thirdNode.getNeighNodes().contains(firstNode));
+        Assert.assertFalse(firstNode.getNeighNodes().contains(thirdNode));
+    }
+    
 }
