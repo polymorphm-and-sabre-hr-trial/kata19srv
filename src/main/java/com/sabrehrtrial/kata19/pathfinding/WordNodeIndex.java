@@ -3,6 +3,7 @@ package com.sabrehrtrial.kata19.pathfinding;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -54,7 +55,7 @@ public class WordNodeIndex {
             
             if (lookingNodeMap == null) {
                 lookingNodeMap = new HashMap<>();
-
+                
                 nodeMapBuckets.put(bucket, lookingNodeMap);
             }
             
@@ -81,19 +82,19 @@ public class WordNodeIndex {
         List<HashMap<String, WordNode>> lookingNodeMaps
                 = getLookingNodeMaps(buckets);
         
-        ArrayList<WordNode> toConnectList = new ArrayList<>();
+        HashSet<WordNode> toConnect = new HashSet<>();
         
         lookingNodeMaps.forEach((lookingNodeMap) -> {
             lookingNodeMap.forEach((oWord, oNode) -> {
                 boolean isGood = distEval.evaluateDistance(word, oWord);
                 
                 if (isGood) {
-                    toConnectList.add(oNode);
+                    toConnect.add(oNode);
                 }
             });
         });
         
-        toConnectList.forEach((oNode) -> {
+        toConnect.forEach((oNode) -> {
             WordNode.connectNodes(node, oNode);
         });
         
