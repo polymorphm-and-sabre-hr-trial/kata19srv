@@ -74,6 +74,26 @@ public class WordNodeIndexTest {
     }
     
     @Test
+    public void shouldFindTheSameNodeAfterAddingThisNode() {
+        WordNode node = new WordNode("rode");
+        
+        index.addWordNode(node);
+        
+        Assert.assertSame(node, index.findNodeByWord("rode"));
+    }
+    
+    @Test
+    public void shouldNotFindTheSameNodeIfAddingThisNodeWasSkipped() {
+        WordNode node1 = new WordNode("rode");
+        WordNode node2 = new WordNode("rode");
+        
+        index.addWordNode(node1);
+        index.addWordNode(node2); // the word is already in the index
+        
+        Assert.assertNotSame(node2, index.findNodeByWord("rode"));
+    }
+    
+    @Test
     public void shouldFindConnectedNodesAfterAddingWords() {
         index.addWord("rubs");
         index.addWord("robs");
