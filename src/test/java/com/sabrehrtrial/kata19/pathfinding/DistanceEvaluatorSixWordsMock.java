@@ -2,8 +2,6 @@ package com.sabrehrtrial.kata19.pathfinding;
 
 /**
  * Mock version of <code>DistanceEvaluator</code> works only with 6 fixed words.
- *
- * @author regular-user
  */
 public class DistanceEvaluatorSixWordsMock
         implements DistanceEvaluator {
