@@ -19,8 +19,21 @@ public class WordNode {
      * @param word the word
      */
     public WordNode(String word) {
+        if (word == null) {
+            throw new NullPointerException("word is null");
+        }
+        
         this.word = word;
         neighNodes = new ArrayList<>();
+    }
+    
+    /**
+     * get the word of the node.
+     * 
+     * @return the word of the node. can not be null.
+     */
+    public String getWord() {
+        return word;
     }
     
     /**
