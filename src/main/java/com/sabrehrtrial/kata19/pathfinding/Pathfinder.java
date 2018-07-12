@@ -77,7 +77,7 @@ public class Pathfinder {
         
         int algoSizeLimit = sizeLimit;
         
-        if (algoSizeLimit != -1) {
+        if (algoSizeLimit > 0) {
             // wave algorithm uses limit with two sides.
             // so we have to decrease it in two times
             
