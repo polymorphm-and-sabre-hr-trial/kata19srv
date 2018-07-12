@@ -31,6 +31,40 @@ public class WordNodeIndex {
     }
     
     /**
+     * get or create (if creating is needed) node maps limited by bucket list.
+     * 
+     * @param buckets list of buckets or null
+     * @return node maps limited by bucket list.
+     */
+    private List<HashMap<String, WordNode>> getLookingNodeMaps(
+            List<Integer> buckets
+    ) {
+        if (buckets == null) {
+            // in this case we have to look the entire node map
+            
+            return Collections.singletonList(allNodeMap);
+        }
+        
+        List<HashMap<String, WordNode>> lookingNodeMaps;
+        
+        lookingNodeMaps = new ArrayList<>();
+        
+        buckets.forEach((bucket) -> {
+            HashMap<String, WordNode> lookingNodeMap = nodeMapBuckets.get(bucket);
+            
+            if (lookingNodeMap == null) {
+                lookingNodeMap = new HashMap<>();
+
+                nodeMapBuckets.put(bucket, lookingNodeMap);
+            }
+            
+            lookingNodeMaps.add(lookingNodeMap);
+        });
+        
+        return lookingNodeMaps;
+    }
+    
+    /**
      * add a word and its node to the index.
      * 
      * @param word a word for adding to the index.
@@ -44,19 +78,8 @@ public class WordNodeIndex {
         List<Integer> buckets = distEval.calcBucket(word);
         
         // we will look for only in these maps, instead of doing brute-force
-        List<HashMap<String, WordNode>> lookingNodeMaps;
-        
-        if (buckets != null) {
-            lookingNodeMaps = new ArrayList<>();
-            
-            buckets.forEach((bucket) -> {
-                lookingNodeMaps.add(nodeMapBuckets.get(bucket));
-            });
-        } else {
-            // in this case we have to look the entire node map
-            
-            lookingNodeMaps = Collections.singletonList(allNodeMap);
-        }
+        List<HashMap<String, WordNode>> lookingNodeMaps
+                = getLookingNodeMaps(buckets);
         
         ArrayList<WordNode> toConnectList = new ArrayList<>();
         
