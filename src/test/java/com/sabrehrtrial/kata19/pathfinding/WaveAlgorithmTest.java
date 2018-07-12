@@ -84,7 +84,7 @@ public class WaveAlgorithmTest {
     }
     
     @Test
-    void recoveryPathShouldBeCorrect() {
+    public void recoveryPathShouldBeCorrect() {
         WordNode middleNode = waveAlgo.spreadWaves(
                 node2, node6,
                 waveSpreadInfo, index, 10
