@@ -9,6 +9,7 @@
     <groupId>com.sabrehrtrial.kata19</groupId>
     <artifactId>kata19-srv</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>${kata19srv.packaging}</packaging>
     
     <name>Kata19 solution for Sabre-HR Trial</name>
     <!--<url>http://www.example.com</url>-->
@@ -19,6 +20,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+        <kata19srv.packaging>jar</kata19srv.packaging>
     </properties>
     
     <dependencies>
@@ -74,7 +76,55 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.8.2</version>
                 </plugin>
+                
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
+    
+    <profiles>
+        <!-- profile for building command line user interface -->
+        <profile>
+            <id>cli</id>
+            
+            <properties>
+                <kata19srv.packaging>jar</kata19srv.packaging>
+            </properties>
+            
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.sabrehrtrial.kata19.cli.Cli</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                    
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                      <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <includeScope>compile</includeScope>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
